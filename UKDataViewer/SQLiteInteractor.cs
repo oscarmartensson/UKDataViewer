@@ -10,11 +10,19 @@ namespace UKDataViewer
     class SQLiteInteractor
     {
         private SQLiteConnection connection;
+        private bool isInitialized = false;
+
+        public void Initialize()
+        {
+            LoadDatabase();
+
+            isInitialized = true;
+        }
 
         // Loads the SQLite database from file which contains all personal
         // information necessary for the application to work.
         // Shuts down if the database couldn't be opened.
-        public void LoadDatabase()
+        private void LoadDatabase()
         {
             string currentDir = Directory.GetCurrentDirectory();
             string dbPath = currentDir + @"\uk-500.db";
@@ -39,11 +47,14 @@ namespace UKDataViewer
             }
 
             connection.Close();
-
-            GetMostCommonEmail();
         }
 
-        private void GetMostCommonEmail()
+        public bool IsInitialized()
+        {
+            return isInitialized;
+        }
+
+        public string GetMostCommonEmail()
         {
             connection.Open();
 
@@ -70,6 +81,8 @@ namespace UKDataViewer
                        
                     } else
                     {
+                        // Address already exists, increment counter for
+                        // number of times this email address has been found.
                         emailAdresses[emailAdress]++;
                     }
                 }
@@ -77,6 +90,8 @@ namespace UKDataViewer
 
             string mostCommonEmail = "";
             int max = 0;
+            // Go through all the different email addresses found and extract
+            // the most common one (i.e. highest Value in emailAdresses.)
             foreach (var email in emailAdresses)
             {
                 int val = email.Value;
@@ -88,6 +103,8 @@ namespace UKDataViewer
             }
 
             connection.Close();
+
+            return mostCommonEmail;
         }
     }
 

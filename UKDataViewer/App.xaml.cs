@@ -13,13 +13,5 @@ namespace UKDataViewer
     /// </summary>
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            base.OnStartup(e);
-
-            // Create instance of the SQLiteInteractor and load in the database.
-            SQLiteInteractor SQLiteDB = new SQLiteInteractor();
-            SQLiteDB.LoadDatabase();
-        }
     }
 }
