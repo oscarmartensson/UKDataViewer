@@ -37,16 +37,14 @@ namespace UKDataViewer
                 ComboBox cb = (ComboBox)sender;
                 ComboBoxItem item = (ComboBoxItem)cb.SelectedItem;
 
-                string propertyString = "";
                 switch((string)item.Content)
                 {
                     case "Email":
                     default:
-                        propertyString = SQLiteDB.GetMostCommonEmail();
+                        this.PropertyTextBox.Text = SQLiteDB.GetMostCommonEmail();
                         break;
                 }
 
-                this.PropertyTextBox.Text = propertyString;
             }
         }
     }
