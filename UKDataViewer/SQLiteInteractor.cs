@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
-
 using System.Data.SQLite;
+
+using DBSCAN;
 
 namespace UKDataViewer
 {
@@ -12,11 +12,20 @@ namespace UKDataViewer
         private SQLiteConnection connection;
         private bool isInitialized = false;
 
-        public void Initialize()
+        private PostcodesClient restClient;
+        private MainWindow mainWindow;
+
+        public SQLiteInteractor(MainWindow _window)
         {
             LoadDatabase();
 
+            restClient = new PostcodesClient();
+
+            mainWindow = _window;
+
             isInitialized = true;
+
+            GetPoscodeLocations();
         }
 
         // Loads the SQLite database from file which contains all personal
@@ -78,7 +87,6 @@ namespace UKDataViewer
                     if (!emailAdresses.ContainsKey(emailAdress))
                     {
                         emailAdresses.Add(emailAdress, 0);
-                       
                     } else
                     {
                         // Address already exists, increment counter for
@@ -106,6 +114,63 @@ namespace UKDataViewer
 
             return mostCommonEmail;
         }
-    }
 
+        public void GetPoscodeLocations()
+        {
+            connection.Open();
+
+            // Get the poscodes from the database by querying the connection.
+            string query = "SELECT postal FROM ukdata";
+            SQLiteCommand command = new SQLiteCommand(query, connection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            List<string> postcodes = new List<string>();
+            while (reader.Read())
+            {
+                postcodes.Add(reader.GetString(0));
+            }
+
+            connection.Close();
+
+            int queryCount = 100;
+            List<BulkQueryResult<string, LongLat>> longLats = new List<BulkQueryResult<string, LongLat>>();
+            for (int i = 0; i < postcodes.Count; i += queryCount)
+            {
+                if (i + queryCount < postcodes.Count)
+                {
+                    var queryResult = restClient.BulkPostcodeLookup(postcodes.GetRange(i, queryCount));
+
+                    if (queryResult != null)
+                    {
+                        longLats.AddRange(queryResult);
+                    }
+                }
+                else
+                {
+                    // There's < 100 elements left in array until we 
+                    // hit the end. Get number of elements left and get that range.
+                    int remainder = postcodes.Count - i;
+
+                    var queryResult = restClient.BulkPostcodeLookup(postcodes.GetRange(i, remainder));
+
+                    if (queryResult != null)
+                    {
+                        longLats.AddRange(queryResult);
+                    }
+                }
+            }
+
+            List<PointInfo<Location>> coords = new List<PointInfo<Location>>(longLats.Count);
+            for (int i = 0; i < longLats.Count; i++)
+            {
+                if(longLats[i].Result != null)
+                {
+                    coords.Add(new PointInfo<Location>(new Location(longLats[i].Result.Longitude, longLats[i].Result.Latitude)));
+                }
+            }
+
+            ListSpatialIndex<PointInfo<Location>> locations = new ListSpatialIndex<PointInfo<Location>>(coords, Location.DistanceFunction);
+            var cluster = DBSCAN.DBSCAN.CalculateClusters(index: locations, 10000.0, 3);
+        }
+    }
 }
