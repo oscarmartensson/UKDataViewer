@@ -8,17 +8,26 @@ using DBSCAN;
 
 namespace UKDataViewer
 {
+    /// <summary>
+    /// A class that acts as an interactor with the SQLite
+    /// database holding all relevant information for this
+    /// application.
+    /// </summary>
     class SQLiteInteractor
     {
-        private SQLiteConnection connection;
         private bool isInitialized = false;
 
+        private SQLiteConnection connection;
         private PostcodesClient restClient;
         private MainWindow mainWindow;
 
-        public SQLiteInteractor(MainWindow _window)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="window">Reference to the main window.</param>
+        public SQLiteInteractor(MainWindow window)
         {
-            mainWindow = _window;
+            mainWindow = window;
 
             LoadDatabase();
 
@@ -29,9 +38,11 @@ namespace UKDataViewer
             GetPoscodeLocations();
         }
 
-        // Loads the SQLite database from file which contains all personal
-        // information necessary for the application to work.
-        // Shuts down if the database couldn't be opened.
+        /// <summary>
+        /// Loads the SQLite database from file which contains all personal
+        /// information necessary for the application to work.
+        /// Shuts down if the database couldn't be opened.
+        /// </summary>
         private void LoadDatabase()
         {
             string currentDir = Directory.GetCurrentDirectory();
@@ -59,11 +70,20 @@ namespace UKDataViewer
             connection.Close();
         }
 
+        /// <summary>
+        /// Whether the SQLiteInteractor is initialized or not.
+        /// </summary>
+        /// <returns>Current initialization status.</returns>
         public bool IsInitialized()
         {
             return isInitialized;
         }
 
+        /// <summary>
+        /// Fetches emails from the database and finds the most
+        /// common one.
+        /// </summary>
+        /// <returns>Name of the most common email.</returns>
         public string GetMostCommonEmail()
         {
             connection.Open();
@@ -116,6 +136,13 @@ namespace UKDataViewer
             return mostCommonEmail;
         }
 
+        /// <summary>
+        /// Queries the database for postcodes, then make REST API
+        /// calls using the PostcodeClient class to get the longitude
+        /// and latitude position for the postcodes. Using this data,
+        /// clusters are computed, grouping the postcodes together
+        /// spatially.
+        /// </summary>
         public void GetPoscodeLocations()
         {
             connection.Open();
@@ -128,11 +155,15 @@ namespace UKDataViewer
             List<string> postcodes = new List<string>();
             while (reader.Read())
             {
+                // Read the answer to the database query.
                 postcodes.Add(reader.GetString(0));
             }
 
             connection.Close();
 
+            // Send bulk queries with the postcodes to the restClient to get longitude and latitude positional data
+            // in order to calculate spatial clusters. 100 postcodes are sent at a time (max allowed by site)
+            // to prevent sending too many single requests.
             int queryCount = 100;
             List<BulkQueryResult<string, LongLat>> longLats = new List<BulkQueryResult<string, LongLat>>();
             for (int i = 0; i < postcodes.Count; i += queryCount)

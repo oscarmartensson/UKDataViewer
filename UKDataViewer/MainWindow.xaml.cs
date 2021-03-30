@@ -9,7 +9,7 @@ using System.Windows.Controls;
 namespace UKDataViewer
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for MainWindow.xaml.
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -18,15 +18,22 @@ namespace UKDataViewer
         {
             InitializeComponent();
 
-            // Create instance of the SQLiteInteractor and load in the database.
             SQLiteDB = new SQLiteInteractor(this);
         }
 
+        /// <summary>
+        /// Displays the message in a pop-up window.
+        /// </summary>
+        /// <param name="message">Message to be displayed.</param>
         public void DisplayErrorMessage(string message)
         {
             MessageBox.Show(message, "Error occurred");
         }
 
+        /// <summary>
+        /// Triggers when the PropertyComboBox has changed item in the dropdown menu.
+        /// </summary>
+        /// <param name="sender">The instance that triggered the event.</param>
         private void PropertyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (SQLiteDB != null && SQLiteDB.IsInitialized())
