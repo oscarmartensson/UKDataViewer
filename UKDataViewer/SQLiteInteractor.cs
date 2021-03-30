@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Data.SQLite;
 
+using UKDataViewer.Exceptions;
 using DBSCAN;
 
 namespace UKDataViewer
@@ -138,11 +139,24 @@ namespace UKDataViewer
             {
                 if (i + queryCount < postcodes.Count)
                 {
-                    var queryResult = restClient.BulkPostcodeLookup(postcodes.GetRange(i, queryCount));
-
-                    if (queryResult != null)
+                    try
                     {
-                        longLats.AddRange(queryResult);
+                        var queryResult = restClient.BulkPostcodeLookup(postcodes.GetRange(i, queryCount));
+
+                        if (queryResult != null)
+                        {
+                            longLats.AddRange(queryResult);
+                        }
+                    }
+                    catch (RESTException e)
+                    {
+                        mainWindow.DisplayErrorMessage("Error connecting to Postcodes.IO, check your internet connection. Cluster data won't be able to be shown.");
+                        return;
+                    }
+                    catch (BadStatusException e)
+                    {
+                        mainWindow.DisplayErrorMessage(e.GetBaseException().Message);
+                        return;
                     }
                 }
                 else
@@ -151,11 +165,24 @@ namespace UKDataViewer
                     // hit the end. Get number of elements left and get that range.
                     int remainder = postcodes.Count - i;
 
-                    var queryResult = restClient.BulkPostcodeLookup(postcodes.GetRange(i, remainder));
-
-                    if (queryResult != null)
+                    try
                     {
-                        longLats.AddRange(queryResult);
+                        var queryResult = restClient.BulkPostcodeLookup(postcodes.GetRange(i, remainder));
+
+                        if (queryResult != null)
+                        {
+                            longLats.AddRange(queryResult);
+                        }
+                    }
+                    catch (RESTException /*e*/)
+                    {
+                        mainWindow.DisplayErrorMessage("Error connecting to Postcodes.IO, check your internet connection. Cluster data won't be able to be shown.");
+                        return;
+                    }
+                    catch (BadStatusException e)
+                    {
+                        mainWindow.DisplayErrorMessage(e.GetBaseException().Message);
+                        return;
                     }
                 }
             }

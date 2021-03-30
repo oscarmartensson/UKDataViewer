@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using RestSharp;
 
+using UKDataViewer.Exceptions;
+
 
 namespace UKDataViewer
 {
@@ -27,11 +29,11 @@ namespace UKDataViewer
 
             if (response.ErrorException != null)
             {
-                 // Error handling
+                throw new RESTException(response.ErrorException);
             }
-            if (response.Data != null && response.Data.Status != 200)
+            if (response.Data == null)
             {
-                // Some error due to server not responding.
+                throw new BadStatusException(response.StatusCode, endpoint);
             }
             return response.Data.Result;
         }
