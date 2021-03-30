@@ -24,7 +24,7 @@ namespace UKDataViewer
 
         public void DisplayErrorMessage(string message)
         {
-            MessageBox.Show("Error occured: {0}", message);
+            MessageBox.Show(message, "Error occured");
         }
 
         private void PropertyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
