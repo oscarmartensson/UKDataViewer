@@ -18,11 +18,11 @@ namespace UKDataViewer
 
         public SQLiteInteractor(MainWindow _window)
         {
+            mainWindow = _window;
+
             LoadDatabase();
 
             restClient = new PostcodesClient();
-
-            mainWindow = _window;
 
             isInitialized = true;
 
@@ -40,7 +40,7 @@ namespace UKDataViewer
 
             if (!File.Exists(dbPath))
             {
-                Console.WriteLine("Database 'uk-data.db' doesn't exist. Exiting program.");
+                mainWindow.DisplayErrorMessage("Database 'uk-data.db' doesn't exist. Exiting program.");
                 Environment.Exit(1);
             }
 
@@ -52,7 +52,7 @@ namespace UKDataViewer
             }
             catch
             {
-                Console.WriteLine("Database 'uk-data.db' couldn't be opened. Exiting program.");
+                mainWindow.DisplayErrorMessage("Database 'uk-data.db' couldn't be opened. Exiting program.");
                 Environment.Exit(1);
             }
 
@@ -120,7 +120,7 @@ namespace UKDataViewer
         {
             connection.Open();
 
-            // Get the poscodes from the database by querying the connection.
+            // Get the postcodes from the database by querying the connection.
             string query = "SELECT postal FROM ukdata";
             SQLiteCommand command = new SQLiteCommand(query, connection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -150,7 +150,7 @@ namespace UKDataViewer
                     }
                     catch (RESTException /*e*/)
                     {
-                        mainWindow.DisplayErrorMessage("Error connecting to Postcodes.IO, check your internet connection. Cluster data won't be able to be shown.");
+                        mainWindow.DisplayErrorMessage("Error connecting to Postcodes.IO, check your Internet connection. Cluster data won't be able to be shown.");
                         return;
                     }
                     catch (BadStatusException e)
@@ -176,7 +176,7 @@ namespace UKDataViewer
                     }
                     catch (RESTException /*e*/)
                     {
-                        mainWindow.DisplayErrorMessage("Error connecting to Postcodes.IO, check your internet connection. Cluster data won't be able to be shown.");
+                        mainWindow.DisplayErrorMessage("Error connecting to Postcodes.IO, check your Internet connection. Cluster data won't be able to be shown.");
                         return;
                     }
                     catch (BadStatusException e)
