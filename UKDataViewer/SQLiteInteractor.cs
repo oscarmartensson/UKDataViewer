@@ -148,7 +148,7 @@ namespace UKDataViewer
                             longLats.AddRange(queryResult);
                         }
                     }
-                    catch (RESTException e)
+                    catch (RESTException /*e*/)
                     {
                         mainWindow.DisplayErrorMessage("Error connecting to Postcodes.IO, check your internet connection. Cluster data won't be able to be shown.");
                         return;
