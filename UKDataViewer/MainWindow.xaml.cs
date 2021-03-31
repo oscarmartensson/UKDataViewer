@@ -77,7 +77,7 @@ namespace UKDataViewer
             if (isDoubleSearchRadius && isIntClusterSize)
             {
                 // Both inputs are valid.
-                this.clusters = SQLiteDB.GetPoscodeLocations(searchRadius, clusterSize);
+                this.clusters = SQLiteDB.GetClusterData(searchRadius, clusterSize);
                 this.ClusterComboBox.Items.Clear();
                 if (clusters != null && clusters.Count > 0)
                 {

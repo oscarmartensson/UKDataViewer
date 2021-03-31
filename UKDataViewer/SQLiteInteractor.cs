@@ -35,7 +35,7 @@ namespace UKDataViewer
 
             isInitialized = true;
 
-            GetPoscodeLocations();
+            GetClusterData();
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace UKDataViewer
         /// clusters are computed, grouping the postcodes together
         /// spatially.
         /// </summary>
-        public List<DBSCAN.Cluster<ClusterInfo>> GetPoscodeLocations(double searchRadius = 10000.0, int clusterSize = 3)
+        public List<DBSCAN.Cluster<ClusterInfo>> GetClusterData(double searchRadius = 10000.0, int clusterSize = 3)
         {
             connection.Open();
 
@@ -160,6 +160,7 @@ namespace UKDataViewer
                 postcodes.Add(reader.GetString(0));
             }
 
+            // Get all useful data for the cluster display.
             query = "SELECT first_name, county, city FROM ukdata";
             command = new SQLiteCommand(query, connection);
             reader = command.ExecuteReader();
