@@ -164,6 +164,9 @@ namespace UKDataViewer
             // in order to calculate spatial clusters. 100 postcodes are sent at a time (max allowed by site)
             // to prevent sending too many single requests.
             int queryCount = 100;
+
+            // We're only interested in the longitude and latitude for cluster computation.
+            string postcodesQuery = "postcodes?filter=longitude,latitude";
             List<BulkQueryResult<string, LongLat>> longLats = new List<BulkQueryResult<string, LongLat>>();
             for (int i = 0; i < postcodes.Count - 1; i += queryCount)
             {
@@ -171,7 +174,7 @@ namespace UKDataViewer
                 {
                     try
                     {
-                        var queryResult = restClient.BulkPostcodeLookup(postcodes.GetRange(i, queryCount));
+                        var queryResult = restClient.BulkPostcodeLookup<LongLat>(postcodes.GetRange(i, queryCount), postcodesQuery);
 
                         if (queryResult != null)
                         {
@@ -197,7 +200,7 @@ namespace UKDataViewer
 
                     try
                     {
-                        var queryResult = restClient.BulkPostcodeLookup(postcodes.GetRange(i, remainder));
+                        var queryResult = restClient.BulkPostcodeLookup<LongLat>(postcodes.GetRange(i, remainder), postcodesQuery);
 
                         if (queryResult != null)
                         {

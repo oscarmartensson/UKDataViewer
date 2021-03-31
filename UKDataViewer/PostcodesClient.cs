@@ -29,16 +29,16 @@ namespace UKDataViewer
         /// </summary>
         /// <param name="postcodes">List of postcodes.</param>
         /// <returns>List of result query from the endpoint.</returns>
-        public List<BulkQueryResult<string, LongLat>> BulkPostcodeLookup(List<string> postcodes)
+        public List<BulkQueryResult<string, T>> BulkPostcodeLookup<T>(List<string> postcodes, string query = "postcodes") where T : class
         {
-            // We're only interested in the longitude and latitude for cluster computation.
-            var request = new RestRequest("postcodes?filter=longitude,latitude", Method.POST)
+
+            var request = new RestRequest(query, Method.POST)
             {
                 RequestFormat = DataFormat.Json
             };
             request.AddJsonBody(new { postcodes });
 
-            var response = client.Execute<PostcodeIOResponse<List<BulkQueryResult<string, LongLat>>>>(request);
+            var response = client.Execute<PostcodeIOResponse<List<BulkQueryResult<string, T>>>>(request);
 
             if (response.ErrorException != null)
             {
