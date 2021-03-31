@@ -13,7 +13,7 @@ namespace UKDataViewer
     public partial class MainWindow : Window
     {
         private SQLiteInteractor SQLiteDB;
-        private List<DBSCAN.Cluster<Location>> clusters = null;
+        private List<DBSCAN.Cluster<ClusterInfo>> clusters = null;
 
         private ObservableCollection<ClusterInfo> clusterCollection = new ObservableCollection<ClusterInfo>();
         public MainWindow()
@@ -78,9 +78,9 @@ namespace UKDataViewer
             {
                 // Both inputs are valid.
                 this.clusters = SQLiteDB.GetPoscodeLocations(searchRadius, clusterSize);
-                if (clusters != null)
+                this.ClusterComboBox.Items.Clear();
+                if (clusters != null && clusters.Count > 0)
                 {
-                    this.ClusterComboBox.Items.Clear();
                     this.ClusterComboBox.Items.Add("Cluster 1");
                     this.ClusterComboBox.Items.Add("Cluster 2");
                     this.ClusterComboBox.Items.Add("Cluster 3");
@@ -146,9 +146,11 @@ namespace UKDataViewer
             this.ClusterSizeOuput.Text = string.Format("{0}", clusterSize);
             for (int j = 0; j < clusterSize - 1; j++)
             {
-                double longitude = clusters[clusterIndex].Objects[j].Point.Y;
-                double latitude = clusters[clusterIndex].Objects[j].Point.X;
-                clusterCollection.Add(new ClusterInfo("-", "-", "-", longitude, latitude));
+                //string name = clusters[clusterIndex].Objects[j].name;
+                //string name = clusters[clusterIndex].Objects[j].name;
+                //double longitude = clusters[clusterIndex].Objects[j].Point.Y;
+                //double latitude = clusters[clusterIndex].Objects[j].Point.X;
+                clusterCollection.Add(clusters[clusterIndex].Objects[j]);
             }
         }
     }

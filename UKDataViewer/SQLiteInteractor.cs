@@ -143,7 +143,7 @@ namespace UKDataViewer
         /// clusters are computed, grouping the postcodes together
         /// spatially.
         /// </summary>
-        public List<DBSCAN.Cluster<Location>> GetPoscodeLocations(double searchRadius = 10000.0, int clusterSize = 3)
+        public List<DBSCAN.Cluster<ClusterInfo>> GetPoscodeLocations(double searchRadius = 10000.0, int clusterSize = 3)
         {
             connection.Open();
 
@@ -153,11 +153,29 @@ namespace UKDataViewer
             SQLiteDataReader reader = command.ExecuteReader();
 
             List<string> postcodes = new List<string>();
+
             while (reader.Read())
             {
                 // Read the answer to the database query.
                 postcodes.Add(reader.GetString(0));
             }
+
+            query = "SELECT first_name, county, city FROM ukdata";
+            command = new SQLiteCommand(query, connection);
+            reader = command.ExecuteReader();
+
+            List<ClusterInfo> clusterData = new List<ClusterInfo>();
+            while (reader.Read())
+            {
+                // Read the answer to the database query.
+                ClusterInfo clusterInfo =
+                    new ClusterInfo(reader.GetString(0),
+                                    reader.GetString(1),
+                                    reader.GetString(2));
+                clusterData.Add(clusterInfo);
+            }
+
+
             connection.Close();
 
             // Send bulk queries with the postcodes to the restClient to get longitude and latitude positional data
@@ -220,17 +238,21 @@ namespace UKDataViewer
                 }
             }
 
-            List<DBSCAN.PointInfo<Location>> coords = new List<DBSCAN.PointInfo<Location>>(longLats.Count);
+            List<DBSCAN.PointInfo<ClusterInfo>> coords = new List<DBSCAN.PointInfo<ClusterInfo>>(longLats.Count);
             for (int i = 0; i < longLats.Count - 1; i++)
             {
                 if (longLats[i].Result != null)
                 {
-                    coords.Add(new DBSCAN.PointInfo<Location>(new Location(longLats[i].Result.Longitude, longLats[i].Result.Latitude)));
+                    coords.Add(new DBSCAN.PointInfo<ClusterInfo>(new ClusterInfo(clusterData[i].name,
+                                                                                 clusterData[i].county,
+                                                                                 clusterData[i].city,
+                                                                                 longLats[i].Result.Longitude,
+                                                                                 longLats[i].Result.Latitude)));
                 }
             }
 
             // Create a data structure that fits the interface of the DBSCAN algorithm when using a custom distance function.
-            DBSCAN.ListSpatialIndex<DBSCAN.PointInfo<Location>> locations = new DBSCAN.ListSpatialIndex<DBSCAN.PointInfo<Location>>(coords, Location.DistanceFunction);
+            DBSCAN.ListSpatialIndex<DBSCAN.PointInfo<ClusterInfo>> locations = new DBSCAN.ListSpatialIndex<DBSCAN.PointInfo<ClusterInfo>>(coords, ClusterInfo.DistanceFunction);
 
             // Run the DBSCAN cluster algorithm to group the data together.
             var clusters = DBSCAN.DBSCAN.CalculateClusters(index: locations, searchRadius, clusterSize);
