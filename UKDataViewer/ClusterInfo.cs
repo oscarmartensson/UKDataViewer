@@ -6,7 +6,7 @@ namespace UKDataViewer
     /// Contains all information for a person to be displayed in a
     /// cluster ListView.
     /// </summary>
-    class ClusterInfo
+    public class ClusterInfo
     {
         /// <summary>
         /// Constructor.
