@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Data.SQLite;
+using System.Linq;
 
 using UKDataViewer.Exceptions;
-using DBSCAN;
 
 namespace UKDataViewer
 {
@@ -143,7 +143,7 @@ namespace UKDataViewer
         /// clusters are computed, grouping the postcodes together
         /// spatially.
         /// </summary>
-        public void GetPoscodeLocations()
+        public List<DBSCAN.Cluster<Location>> GetPoscodeLocations(double searchRadius = 10000.0, int clusterSize = 3)
         {
             connection.Open();
 
@@ -158,7 +158,6 @@ namespace UKDataViewer
                 // Read the answer to the database query.
                 postcodes.Add(reader.GetString(0));
             }
-
             connection.Close();
 
             // Send bulk queries with the postcodes to the restClient to get longitude and latitude positional data
@@ -166,9 +165,9 @@ namespace UKDataViewer
             // to prevent sending too many single requests.
             int queryCount = 100;
             List<BulkQueryResult<string, LongLat>> longLats = new List<BulkQueryResult<string, LongLat>>();
-            for (int i = 0; i < postcodes.Count; i += queryCount)
+            for (int i = 0; i < postcodes.Count - 1; i += queryCount)
             {
-                if (i + queryCount < postcodes.Count)
+                if (i + queryCount < postcodes.Count - 1)
                 {
                     try
                     {
@@ -182,12 +181,12 @@ namespace UKDataViewer
                     catch (RESTException /*e*/)
                     {
                         mainWindow.DisplayErrorMessage("Error connecting to Postcodes.IO, check your Internet connection. Cluster data won't be able to be shown.");
-                        return;
+                        return null;
                     }
                     catch (BadStatusException e)
                     {
                         mainWindow.DisplayErrorMessage(e.GetBaseException().Message);
-                        return;
+                        return null;
                     }
                 }
                 else
@@ -208,27 +207,41 @@ namespace UKDataViewer
                     catch (RESTException /*e*/)
                     {
                         mainWindow.DisplayErrorMessage("Error connecting to Postcodes.IO, check your Internet connection. Cluster data won't be able to be shown.");
-                        return;
+                        return null;
                     }
                     catch (BadStatusException e)
                     {
                         mainWindow.DisplayErrorMessage(e.GetBaseException().Message);
-                        return;
+                        return null;
                     }
                 }
             }
 
-            List<PointInfo<Location>> coords = new List<PointInfo<Location>>(longLats.Count);
-            for (int i = 0; i < longLats.Count; i++)
+            List<DBSCAN.PointInfo<Location>> coords = new List<DBSCAN.PointInfo<Location>>(longLats.Count);
+            for (int i = 0; i < longLats.Count - 1; i++)
             {
-                if(longLats[i].Result != null)
+                if (longLats[i].Result != null)
                 {
-                    coords.Add(new PointInfo<Location>(new Location(longLats[i].Result.Longitude, longLats[i].Result.Latitude)));
+                    coords.Add(new DBSCAN.PointInfo<Location>(new Location(longLats[i].Result.Longitude, longLats[i].Result.Latitude)));
                 }
             }
 
-            ListSpatialIndex<PointInfo<Location>> locations = new ListSpatialIndex<PointInfo<Location>>(coords, Location.DistanceFunction);
-            var cluster = DBSCAN.DBSCAN.CalculateClusters(index: locations, 10000.0, 3);
+            // Create a data structure that fits the interface of the DBSCAN algorithm when using a custom distance function.
+            DBSCAN.ListSpatialIndex<DBSCAN.PointInfo<Location>> locations = new DBSCAN.ListSpatialIndex<DBSCAN.PointInfo<Location>>(coords, Location.DistanceFunction);
+
+            // Run the DBSCAN cluster algorithm to group the data together.
+            var clusters = DBSCAN.DBSCAN.CalculateClusters(index: locations, searchRadius, clusterSize);
+
+            if (clusters == null)
+            {
+                // algorithm didn't provide a reasonable answer or something went wrong.
+                return null;
+            }
+
+            // Sort clusters so that the largest one is in the first index of the list, etc.
+            var sortedClusters = clusters.Clusters.OrderBy(x => x.Objects.Count).Reverse().ToList();
+
+            return sortedClusters;
         }
     }
 }

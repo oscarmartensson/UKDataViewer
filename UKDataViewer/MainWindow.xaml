@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UKDataViewer"
         mc:Ignorable="d"
-        Title="UK Data Viewer" Height="450" Width="450">
+        Title="UK Data Viewer" Height="500" Width="500">
     <Border Padding="10">
         <StackPanel>
 
             <!--Section with common properties-->
-            <TextBlock Text="Most common properties" Margin="0 0 0 5" FontWeight="Bold"></TextBlock>
+            <TextBlock Text="Most common properties" FontSize="14" Margin="0 0 0 5" FontWeight="Bold"></TextBlock>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -27,6 +27,62 @@
 
             <Separator Margin="10"/>
 
+            <TextBlock Text="Spatial clusters" FontSize="14" Margin="0 0 0 5" FontWeight="Bold"></TextBlock>
+
+            <!--Input for cluster calculation-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0 0 5 0">
+                    <TextBlock Text="Search radius (meters)"/>
+                    <TextBox x:Name="SearchRadius"  Margin="0 2 0 0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Minimum cluster size"/>
+                    <TextBox x:Name="ClusterSizeInput"  Margin="0 2 0 0"/>
+                </StackPanel>
+            </Grid>
+
+            <Button x:Name="ApplyClusterParams" Margin="0 5 0 0" Click="ApplyClusterParams_Click">Apply</Button>
+
+            <!--Selection of clusters to display info on.-->
+            <TextBlock Text="Select cluster (sorted by largest first)" Margin="0 20 0 0"/>
+            <ComboBox x:Name="ClusterComboBox" SelectionChanged="ClusterComboBox_SelectionChanged" Margin="0 5 0 5" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="5*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Cluster size:" Grid.Column="0" />
+                <TextBox x:Name="ClusterSizeOuput" Grid.Column="1" Background="#eee" />
+            </Grid>
+
+            <TextBlock Text="Cluster info" Margin="0 5 0 0" />
+            <ListView x:Name="ClusterView"
+                      VerticalAlignment="Stretch"
+                      HorizontalAlignment="Stretch"
+                      ScrollViewer.VerticalScrollBarVisibility="Visible"
+                      Background="#eee"
+                      Height="200"
+                      Width="Auto"
+                      Margin="0 5 0 0">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding name}" Width="90" />
+                        <GridViewColumn Header="County" DisplayMemberBinding="{Binding county}" Width="90"/>
+                        <GridViewColumn Header="City" DisplayMemberBinding="{Binding city}" Width="90"/>
+                        <GridViewColumn Header="Longitude" DisplayMemberBinding="{Binding longitude}" Width="70"/>
+                        <GridViewColumn Header="Latitude" DisplayMemberBinding="{Binding latitude}" Width="70"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            
         </StackPanel>
     </Border>
 </Window>
