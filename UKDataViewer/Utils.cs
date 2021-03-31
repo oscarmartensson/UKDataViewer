@@ -1,5 +1,4 @@
 ﻿using System.Device.Location;
-using DBSCAN;
 
 namespace UKDataViewer
 {
@@ -9,7 +8,7 @@ namespace UKDataViewer
     /// </summary>
     public class Location : DBSCAN.IPointData
     {
-        private readonly Point internalPoint;
+        private readonly DBSCAN.Point internalPoint;
 
         /// <summary>
         /// Wraps a longitude and latitude coordinate to interface with
@@ -30,7 +29,7 @@ namespace UKDataViewer
         /// <param name="a">First point.</param>
         /// <param name="b">Second point.</param>
         /// <returns>Distance between two points in meters.</returns>
-        public static double DistanceFunction(in Point a, in Point b)
+        public static double DistanceFunction(in DBSCAN.Point a, in DBSCAN.Point b)
         {
             // Y is the latitude and X is the longitude.
             GeoCoordinate coord1 = new GeoCoordinate(a.Y, a.X);
