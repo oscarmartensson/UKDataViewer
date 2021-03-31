@@ -32,6 +32,7 @@ namespace UKDataViewer
         /// <returns>Distance between two points in meters.</returns>
         public static double DistanceFunction(in Point a, in Point b)
         {
+            // Y is the latitude and X is the longitude.
             GeoCoordinate coord1 = new GeoCoordinate(a.Y, a.X);
             return coord1.GetDistanceTo( new GeoCoordinate(b.Y, b.X) );
         }
