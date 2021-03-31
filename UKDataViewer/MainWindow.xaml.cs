@@ -146,10 +146,6 @@ namespace UKDataViewer
             this.ClusterSizeOuput.Text = string.Format("{0}", clusterSize);
             for (int j = 0; j < clusterSize - 1; j++)
             {
-                //string name = clusters[clusterIndex].Objects[j].name;
-                //string name = clusters[clusterIndex].Objects[j].name;
-                //double longitude = clusters[clusterIndex].Objects[j].Point.Y;
-                //double latitude = clusters[clusterIndex].Objects[j].Point.X;
                 clusterCollection.Add(clusters[clusterIndex].Objects[j]);
             }
         }
