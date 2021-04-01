@@ -60,7 +60,7 @@
                     <ColumnDefinition Width="5*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Cluster size:" Grid.Column="0" />
-                <TextBox x:Name="ClusterSizeOuput" Grid.Column="1" Background="#eee" />
+                <TextBox x:Name="ClusterSizeOuput" Grid.Column="1" IsReadOnly="True" Background="#eee" />
             </Grid>
 
             <TextBlock Text="Cluster info" Margin="0 5 0 0" />
