@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UKDataViewer"
         mc:Ignorable="d"
-        Title="UK Data Viewer" Height="500" Width="500">
+        Title="UK Data Viewer" Height="560" Width="500">
     <Border Padding="10">
         <StackPanel>
 
@@ -27,8 +27,17 @@
 
             <Separator Margin="10"/>
 
-            <TextBlock Text="Spatial clusters" FontSize="14" Margin="0 0 0 5" FontWeight="Bold"></TextBlock>
-
+            <TextBlock Text="Spatial clusters" FontSize="14" Margin="0 0 0 5" FontWeight="Bold" />
+            <TextBlock Text=
+                       "Displays up to 3 of the largest spatial clusters in the data set."
+                       Margin="0 0 0 0"
+                       FontWeight="Thin">
+            </TextBlock>
+            <TextBlock Text=
+                       "Enter desired search radius and cluster size, and hit Apply to calculate and display clusters."
+                       Margin="0 0 0 5"
+                       FontWeight="Thin">
+            </TextBlock>
             <!--Input for cluster calculation-->
             <Grid>
                 <Grid.ColumnDefinitions>
