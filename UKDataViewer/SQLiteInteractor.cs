@@ -185,12 +185,13 @@ namespace UKDataViewer
             // We're only interested in the longitude and latitude for cluster computation.
             string postcodesQuery = "postcodes?filter=longitude,latitude";
             List<BulkQueryResult<string, LongLat>> longLats = new List<BulkQueryResult<string, LongLat>>();
-            for (int i = 0; i < postcodes.Count - 1; i += queryCount)
+            for (int i = 0; i < postcodes.Count; i += queryCount)
             {
-                if (i + queryCount < postcodes.Count - 1)
+                if (i + queryCount < postcodes.Count)
                 {
                     try
                     {
+                        var bla = postcodes.GetRange(i, queryCount);
                         var queryResult = restClient.BulkPostcodeLookup<LongLat>(postcodes.GetRange(i, queryCount), postcodesQuery);
 
                         if (queryResult != null)
@@ -213,7 +214,7 @@ namespace UKDataViewer
                 {
                     // There's < 100 elements left in array until we 
                     // hit the end. Get number of elements left and get that range.
-                    int remainder = postcodes.Count - i;
+                    int remainder = postcodes.Count - i - 1;
 
                     try
                     {
@@ -238,7 +239,7 @@ namespace UKDataViewer
             }
 
             List<DBSCAN.PointInfo<ClusterInfo>> coords = new List<DBSCAN.PointInfo<ClusterInfo>>(longLats.Count);
-            for (int i = 0; i < longLats.Count - 1; i++)
+            for (int i = 0; i < longLats.Count; i++)
             {
                 if (longLats[i].Result != null)
                 {
