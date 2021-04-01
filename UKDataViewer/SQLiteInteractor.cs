@@ -34,8 +34,6 @@ namespace UKDataViewer
             restClient = new PostcodesClient();
 
             isInitialized = true;
-
-            GetClusterData();
         }
 
         /// <summary>
