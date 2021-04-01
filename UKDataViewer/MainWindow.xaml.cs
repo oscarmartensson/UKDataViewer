@@ -13,9 +13,25 @@ namespace UKDataViewer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private SQLiteInteractor SQLiteDB;
-        private List<DBSCAN.Cluster<ClusterInfo>> clusters = null;
+        /// <summary>
+        /// Max number of clusters to be displayed.
+        /// </summary>
         private readonly int maxClusters = 3;
+
+        /// <summary>
+        /// Cluster data.
+        /// </summary>
+        private List<DBSCAN.Cluster<ClusterInfo>> clusters = null;
+
+        /// <summary>
+        /// Interacts with database and gets data to be displayed in GUI.
+        /// </summary>
+        private SQLiteInteractor SQLiteDB;
+
+        /// <summary>
+        /// Cluster names and cluster position to check against
+        /// out of bounds for number of clusters calculated.
+        /// </summary>
         private Dictionary<string, int> clusterNames;
 
         private ObservableCollection<ClusterInfo> clusterCollection = new ObservableCollection<ClusterInfo>();
@@ -141,6 +157,7 @@ namespace UKDataViewer
             this.ClusterSizeOuput.Text = string.Format("{0}", clusterSize);
             for (int j = 0; j < clusterSize - 1; j++)
             {
+                // Update all data shown in the ListView.
                 clusterCollection.Add(clusters[clusterIndex].Objects[j]);
             }
         }

@@ -15,10 +15,24 @@ namespace UKDataViewer
     /// </summary>
     class SQLiteInteractor
     {
+        /// <summary>
+        /// Whether this instance was initialized or not.
+        /// </summary>
         private bool isInitialized = false;
 
+        /// <summary>
+        /// Connection to SQLite database.
+        /// </summary>
         private SQLiteConnection connection;
+
+        /// <summary>
+        /// Instance of client that makes REST queries to endpoint url.
+        /// </summary>
         private PostcodesClient restClient;
+
+        /// <summary>
+        /// Reference to main window.
+        /// </summary>
         private MainWindow mainWindow;
 
         /// <summary>
