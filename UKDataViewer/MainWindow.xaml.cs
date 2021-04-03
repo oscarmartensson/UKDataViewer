@@ -27,7 +27,7 @@ namespace UKDataViewer
         /// <summary>
         /// Interacts with database and gets data to be displayed in GUI.
         /// </summary>
-        private SQLiteInteractor SQLiteDB;
+        private SQLiteInteractor sqliteDB;
 
         /// <summary>
         /// Cluster names and cluster position to check against
@@ -40,7 +40,7 @@ namespace UKDataViewer
         {
             InitializeComponent();
 
-            SQLiteDB = new SQLiteInteractor(this);
+            sqliteDB = new SQLiteInteractor(this);
 
             // Set default values for application GUI.
             this.SearchRadius.Text = "10000";
@@ -71,7 +71,7 @@ namespace UKDataViewer
         /// <param name="e">Information about the event.</param>
         private void PropertyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (SQLiteDB != null && SQLiteDB.IsInitialized())
+            if (sqliteDB != null && sqliteDB.IsInitialized())
             {
                 ComboBox cb = (ComboBox)sender;
                 ComboBoxItem item = (ComboBoxItem)cb.SelectedItem;
@@ -80,7 +80,7 @@ namespace UKDataViewer
                 {
                     case "Email":
                     default:
-                        this.PropertyTextBox.Text = SQLiteDB.GetMostCommonEmail();
+                        this.PropertyTextBox.Text = sqliteDB.GetMostCommonEmail();
                         break;
                 }
             }
@@ -100,10 +100,10 @@ namespace UKDataViewer
             bool isDoubleSearchRadius = double.TryParse(this.SearchRadius.Text, styles, provider, out double searchRadius);
             bool isIntClusterSize = int.TryParse(this.ClusterSizeInput.Text, styles, provider, out int clusterSize);
 
-            if (isDoubleSearchRadius && isIntClusterSize && SQLiteDB != null)
+            if (isDoubleSearchRadius && isIntClusterSize && sqliteDB != null)
             {
                 // Both input parameters are valid.
-                this.clusters = await SQLiteDB.GetClusterData(searchRadius, clusterSize);
+                this.clusters = await sqliteDB.GetClusterData(searchRadius, clusterSize);
                 this.ClusterComboBox.Items.Clear();
 
                 if (clusters != null)
