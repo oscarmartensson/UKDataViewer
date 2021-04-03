@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Data.SQLite;
 using System.Linq;
+using System.Threading.Tasks;
 
 using UKDataViewer.Exceptions;
 
 namespace UKDataViewer
 {
+
     /// <summary>
     /// A class that acts as an interactor with the SQLite
     /// database holding all relevant information for this
@@ -21,11 +23,6 @@ namespace UKDataViewer
         private bool isInitialized = false;
 
         /// <summary>
-        /// Connection to SQLite database.
-        /// </summary>
-        private SQLiteConnection connection;
-
-        /// <summary>
         /// Instance of client that makes REST queries to endpoint url.
         /// </summary>
         private PostcodesClient restClient;
@@ -36,6 +33,11 @@ namespace UKDataViewer
         private MainWindow mainWindow;
 
         /// <summary>
+        /// Path to the database file.
+        /// </summary>
+        private string databasePath;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="window">Reference to the main window.</param>
@@ -43,23 +45,8 @@ namespace UKDataViewer
         {
             mainWindow = window;
 
-            LoadDatabase();
-
-            restClient = new PostcodesClient();
-
-            isInitialized = true;
-        }
-
-        /// <summary>
-        /// Loads the SQLite database from file which contains all personal
-        /// information necessary for the application to work.
-        /// Shuts down if the database couldn't be opened.
-        /// </summary>
-        private void LoadDatabase()
-        {
             string currentDir = Directory.GetCurrentDirectory();
             string dbPath = currentDir + @"\uk-500.db";
-            Console.WriteLine(dbPath);
 
             if (!File.Exists(dbPath))
             {
@@ -67,19 +54,11 @@ namespace UKDataViewer
                 Environment.Exit(1);
             }
 
-            try
-            {
-                // Try to open the database to make sure it works.
-                connection = new SQLiteConnection(@"URI=file:" + dbPath);
-                connection.Open();
-            }
-            catch
-            {
-                mainWindow.DisplayErrorMessage("Database 'uk-data.db' couldn't be opened. Exiting program.");
-                Environment.Exit(1);
-            }
+            databasePath = dbPath;
 
-            connection.Close();
+            restClient = new PostcodesClient();
+
+            isInitialized = true;
         }
 
         /// <summary>
@@ -98,6 +77,7 @@ namespace UKDataViewer
         /// <returns>Name of the most common email.</returns>
         public string GetMostCommonEmail()
         {
+            var connection = new SQLiteConnection(@"URI=file:" + databasePath);
             connection.Open();
 
             // Get the email addresses from the database by querying the connection.
@@ -155,8 +135,9 @@ namespace UKDataViewer
         /// clusters are computed, grouping the postcodes together
         /// spatially.
         /// </summary>
-        public List<DBSCAN.Cluster<ClusterInfo>> GetClusterData(double searchRadius = 10000.0, int clusterSize = 3)
+        public async Task<List<DBSCAN.Cluster<ClusterInfo>>> GetClusterData(double searchRadius = 10000.0, int clusterSize = 3)
         {
+            var connection = new SQLiteConnection(@"URI=file:" + databasePath);
             connection.Open();
 
             // Get the postcodes from the database by querying the connection.
@@ -210,7 +191,7 @@ namespace UKDataViewer
 
                         if (queryResult != null)
                         {
-                            longLats.AddRange(queryResult);
+                            longLats.AddRange(await queryResult);
                         }
                     }
                     catch (RESTException /*e*/)
@@ -236,7 +217,7 @@ namespace UKDataViewer
 
                         if (queryResult != null)
                         {
-                            longLats.AddRange(queryResult);
+                            longLats.AddRange(await queryResult);
                         }
                     }
                     catch (RESTException /*e*/)

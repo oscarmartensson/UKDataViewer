@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using RestSharp;
 
 using UKDataViewer.Exceptions;
@@ -29,7 +30,7 @@ namespace UKDataViewer
         /// </summary>
         /// <param name="postcodes">List of postcodes.</param>
         /// <returns>List of result query from the endpoint.</returns>
-        public List<BulkQueryResult<string, T>> BulkPostcodeLookup<T>(List<string> postcodes, string query = "postcodes") where T : class
+        public async Task<List<BulkQueryResult<string, T>>> BulkPostcodeLookup<T>(List<string> postcodes, string query = "postcodes") where T : class
         {
 
             var request = new RestRequest(query, Method.POST)
@@ -38,7 +39,7 @@ namespace UKDataViewer
             };
             request.AddJsonBody(new { postcodes });
 
-            var response = client.Execute<PostcodeIOResponse<List<BulkQueryResult<string, T>>>>(request);
+            var response = await client.ExecuteAsync<PostcodeIOResponse<List<BulkQueryResult<string, T>>>>(request);
 
             if (response.ErrorException != null)
             {

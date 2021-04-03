@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Globalization;
@@ -90,7 +91,7 @@ namespace UKDataViewer
         /// </summary>
         /// <param name="sender">The item that triggered the event.</param>
         /// <param name="e">Information about the event.</param>
-        private void ApplyClusterParams_Click(object sender, RoutedEventArgs e)
+        private async void ApplyClusterParams_Click(object sender, RoutedEventArgs e)
         {
             // Must be positive values without decimals.
             var styles = NumberStyles.AllowTrailingWhite | NumberStyles.AllowLeadingWhite;
@@ -102,7 +103,7 @@ namespace UKDataViewer
             if (isDoubleSearchRadius && isIntClusterSize && SQLiteDB != null)
             {
                 // Both input parameters are valid.
-                this.clusters = SQLiteDB.GetClusterData(searchRadius, clusterSize);
+                this.clusters = await SQLiteDB.GetClusterData(searchRadius, clusterSize);
                 this.ClusterComboBox.Items.Clear();
 
                 if (clusters != null)
