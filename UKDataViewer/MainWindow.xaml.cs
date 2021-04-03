@@ -156,7 +156,7 @@ namespace UKDataViewer
 
             int clusterSize = clusters[clusterIndex].Objects.Count;
             this.ClusterSizeOuput.Text = string.Format("{0}", clusterSize);
-            for (int j = 0; j < clusterSize - 1; j++)
+            for (int j = 0; j < clusterSize; j++)
             {
                 // Update all data shown in the ListView.
                 clusterCollection.Add(clusters[clusterIndex].Objects[j]);
