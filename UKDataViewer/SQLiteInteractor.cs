@@ -186,7 +186,6 @@ namespace UKDataViewer
                 {
                     try
                     {
-                        var bla = postcodes.GetRange(i, queryCount);
                         var queryResult = restClient.BulkPostcodeLookup<LongLat>(postcodes.GetRange(i, queryCount), postcodesQuery);
 
                         if (queryResult != null)
